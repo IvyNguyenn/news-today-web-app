@@ -32,7 +32,7 @@ export default {
   },
   mounted() {
     this.fetchData();
-    setInterval(function() {
+    setInterval(() => {
       this.fetchData();
     }, 30000);
   },
@@ -46,6 +46,7 @@ export default {
         params: {
           category: params ? params.category : null,
         },
+        timeout: 120000,
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json",
@@ -57,11 +58,13 @@ export default {
           this.listNews = data.news;
           this.loading = false;
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          this.loading = false;
+        });
     },
     onRefresh(value) {
       console.log(value);
-      this.listNews = [];
       this.fetchData({ category: value });
     },
   },
