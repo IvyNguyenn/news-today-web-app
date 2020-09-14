@@ -34,7 +34,7 @@ export default {
     this.fetchData();
     setInterval(() => {
       this.fetchData();
-    }, 30000);
+    }, 1800000); // call api each 30 minute
   },
   methods: {
     fetchData(params) {
