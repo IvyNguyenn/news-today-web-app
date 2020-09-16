@@ -10,8 +10,9 @@
 
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item href="#" v-on:click="onRefresh('hot')">Hot</b-nav-item>
-          <b-nav-item href="#" disabled>About</b-nav-item>
+          <b-nav-item href="#" v-on:click="onFetchData('hot')">Hot</b-nav-item>
+          <b-nav-item href="#" >About</b-nav-item>
+          <b-nav-item href="#" v-on:click="onSpeak"><b-icon icon="speaker"></b-icon></b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -24,7 +25,7 @@
       </b-collapse>
     </b-navbar>
     <div class="fixed-refresh-button">
-      <b-button pill size="sm" v-on:click="onRefresh" v-b-tooltip.hover title="Refresh news">
+      <b-button pill size="sm" v-on:click="onFetchData" v-b-tooltip.hover title="Refresh news">
         <b-icon icon="arrow-clockwise" font-scale="2" animation="spin"></b-icon>
       </b-button>
     </div>
@@ -74,7 +75,8 @@ export default {
     loading: Boolean,
     hotNews: Array,
     listNews: Array,
-    onRefresh: Function,
+    onFetchData: Function,
+    onSpeak:Function
   },
 };
 </script>

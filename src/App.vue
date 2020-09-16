@@ -5,7 +5,8 @@
       v-bind:msg="msg"
       v-bind:hotNews="hotNews"
       v-bind:listNews="listNews"
-      v-bind:onRefresh="onRefresh"
+      v-bind:onFetchData="onFetchData"
+      v-bind:onSpeak="onSpeak"
       v-bind:loading="loading"
     />
   </div>
@@ -13,7 +14,7 @@
 
 <script>
 import HomePage from "./HomePage/HomePage";
-import { API_URL } from "./const/index";
+import { API_URL ,REFRESH_TIME} from "./const/index";
 import axios from "axios";
 const instanceAxios = axios.create();
 
@@ -28,17 +29,25 @@ export default {
       hotNews: [],
       listNews: [],
       loading: false,
+      refreshNewsInterval: undefined,
+      synth: window.speechSynthesis,
+      voiceList: [],
+      greetingSpeech: new window.SpeechSynthesisUtterance()
     };
   },
+  created(){
+    clearInterval(this.refreshNewsInterval);
+    this.refreshNewsInterval = setInterval(() => {
+        this.fetchDataApi();
+      }, REFRESH_TIME);
+  },
   mounted() {
-    this.fetchData();
-    setInterval(() => {
-      this.fetchData();
-    }, 1800000); // call api each 30 minute
+    this.voiceList = this.synth.getVoices();
+    this.onFetchData();
+    this.onTextToSpeech();
   },
   methods: {
-    fetchData(params) {
-      this.loading = true;
+    fetchDataApi(params) {
       instanceAxios({
         method: "GET",
         baseURL: API_URL,
@@ -63,10 +72,22 @@ export default {
           this.loading = false;
         });
     },
-    onRefresh(value) {
-      console.log(value);
-      this.fetchData({ category: value });
+    onFetchData(value) {
+      this.loading = true;
+      // console.log(value);
+      this.fetchDataApi({ category: value });
     },
+    onTextToSpeech(){
+    },
+    onSpeak (){
+      // it should be 'craic', but it doesn't sound right
+      let myText = "Welcome to News Today!";
+      this.greetingSpeech.text = myText
+
+      // this.greetingSpeech.voice = this.voiceList[this.selectedVoice]
+      
+      this.synth.speak(this.greetingSpeech)
+    }
   },
 };
 </script>
