@@ -11,8 +11,11 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item href="#" v-on:click="onFetchData('hot')">Hot</b-nav-item>
-          <b-nav-item href="#" >About</b-nav-item>
-          <b-nav-item href="#" v-on:click="onSpeak"><b-icon icon="speaker"></b-icon></b-nav-item>
+          <b-nav-item href="#">About</b-nav-item>
+          <b-nav-item href="#">Weather</b-nav-item>
+          <b-nav-item href="#" v-on:click="onSpeak">
+            <b-icon icon="speaker"></b-icon>
+          </b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
@@ -33,6 +36,23 @@
       <b-icon v-if="loading" icon="three-dots" animation="cylon" font-scale="5"></b-icon>
     </div>
     <div class="home-title-container">
+      <h5 class="main-title">{{ weatherData.timezone }}</h5>
+      <b-row class="weather-wrapper" v-if="weatherData && weatherData.currently">
+        <b-col cols="4" sm="4">
+          <WeatherBox v-bind:weatherData="weatherData.currently" />
+        </b-col>
+        <b-col cols="4" sm="4">
+          <WeatherBox
+            v-bind:weatherData="{
+              ...weatherData.hourly,
+              time: 'Hourly'
+            }"
+          />
+        </b-col>
+        <b-col cols="4" sm="4">
+          <WeatherBox v-bind:weatherData="{ ...weatherData.daily, time: 'Daily' }" />
+        </b-col>
+      </b-row>
       <div v-bind:style="{ opacity: loading ? 0.7 : 1 }">
         <div class="hot-new-container" v-for="item in hotNews" :key="item.index">
           <img v-bind:src="`${item.image}`" />
@@ -63,21 +83,38 @@
           </b-row>
         </div>
       </div>
+      <p v-bind:style="{ marginLeft: '20px' }">NEXT 7 DAYS</p>
+      <div class="weather-wrapper-inline">
+        <span v-for="item in weatherData.daily.data" :key="item.index">
+          <WeatherBox v-bind:weatherData="item" />
+        </span>
+      </div>
+      <p v-bind:style="{ marginLeft: '20px' }">NEXT 24 HOURS</p>
+      <div class="weather-wrapper-inline">
+        <span v-for="item in weatherData.hourly.data" :key="item.index">
+          <WeatherBox v-bind:weatherData="item" />
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import WeatherBox from "../components/WeatherBox/WeatherBox";
 export default {
   name: "HomePage",
+  components: {
+    WeatherBox
+  },
   props: {
     msg: String,
     loading: Boolean,
     hotNews: Array,
     listNews: Array,
     onFetchData: Function,
-    onSpeak:Function
-  },
+    onSpeak: Function,
+    weatherData: Object
+  }
 };
 </script>
 
@@ -138,6 +175,10 @@ a {
   margin: 22px 10px 0px 10px;
   text-align: center;
 }
+.home-title-container .main-title {
+  text-align: center;
+  margin-top: 15px;
+}
 .home-page-wrapper .hot-new-container {
   margin: 20px;
   background-color: #e6e6e6;
@@ -188,9 +229,24 @@ a {
   top: 50%;
   left: 39%;
 }
+.home-title-container .weather-wrapper {
+  margin-left: 12px !important;
+  margin-right: 12px !important;
+}
+.home-title-container .weather-wrapper > div {
+  padding-right: 5px !important;
+  padding-left: 5px !important;
+  margin-bottom: 10px;
+}
+.home-title-container .weather-wrapper-inline {
+  display: flex;
+  overflow-x: scroll;
+  margin: 0px 15px 15px 15px;
+}
 @media screen and (min-width: 900px) {
   .home-title-container {
     width: 75%;
+    margin-top: 5%;
   }
   .home-page-wrapper .hot-new-container {
     display: flex;
@@ -216,6 +272,11 @@ a {
   }
   .home-page-wrapper .fixed-loading-icon {
     left: 47%;
+  }
+}
+@media screen and (max-width: 600px) {
+  .home-title-container .weather-wrapper {
+    margin-top: 10px;
   }
 }
 </style>

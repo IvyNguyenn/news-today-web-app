@@ -8,26 +8,34 @@
       v-bind:onFetchData="onFetchData"
       v-bind:onSpeak="onSpeak"
       v-bind:loading="loading"
+      v-bind:weatherData="weatherData"
     />
   </div>
 </template>
 
 <script>
 import HomePage from "./HomePage/HomePage";
-import { API_URL ,REFRESH_TIME} from "./const/index";
+import {
+  CORS_API,
+  API_URL,
+  REFRESH_TIME,
+  DARK_SKY_API,
+  DARK_SKY_KEY
+} from "./const/index";
 import axios from "axios";
 const instanceAxios = axios.create();
 
 export default {
   name: "App",
   components: {
-    HomePage,
+    HomePage
   },
   data() {
     return {
       msg: "NEWS TODAY",
       hotNews: [],
       listNews: [],
+      weatherData: {},
       loading: false,
       refreshNewsInterval: undefined,
       synth: window.speechSynthesis,
@@ -35,14 +43,15 @@ export default {
       greetingSpeech: new window.SpeechSynthesisUtterance()
     };
   },
-  created(){
+  created() {
     clearInterval(this.refreshNewsInterval);
     this.refreshNewsInterval = setInterval(() => {
-        this.fetchDataApi();
-      }, REFRESH_TIME);
+      this.fetchDataApi();
+    }, REFRESH_TIME);
   },
   mounted() {
     this.voiceList = this.synth.getVoices();
+    this.fetchWeatherDataApi();
     this.onFetchData();
     this.onTextToSpeech();
   },
@@ -53,21 +62,37 @@ export default {
         baseURL: API_URL,
         url: "/news",
         params: {
-          category: params ? params.category : null,
+          category: params ? params.category : null
         },
         timeout: 120000,
         headers: {
           "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       })
-        .then((response) => {
+        .then(response => {
           const { data } = response.data;
           this.hotNews = data.hotNews;
           this.listNews = data.news;
           this.loading = false;
         })
-        .catch((err) => {
+        .catch(err => {
+          console.log(err);
+          this.loading = false;
+        });
+    },
+    fetchWeatherDataApi() {
+      instanceAxios({
+        method: "GET",
+        baseURL: CORS_API + DARK_SKY_API,
+        url: `${DARK_SKY_KEY}/10.8231,106.6297`
+      })
+        .then(response => {
+          const { data } = response;
+          this.weatherData = data;
+          this.loading = false;
+        })
+        .catch(err => {
           console.log(err);
           this.loading = false;
         });
@@ -77,18 +102,17 @@ export default {
       // console.log(value);
       this.fetchDataApi({ category: value });
     },
-    onTextToSpeech(){
-    },
-    onSpeak (){
+    onTextToSpeech() {},
+    onSpeak() {
       // it should be 'craic', but it doesn't sound right
       let myText = "Welcome to News Today!";
-      this.greetingSpeech.text = myText
+      this.greetingSpeech.text = myText;
 
       // this.greetingSpeech.voice = this.voiceList[this.selectedVoice]
-      
-      this.synth.speak(this.greetingSpeech)
+
+      this.synth.speak(this.greetingSpeech);
     }
-  },
+  }
 };
 </script>
 
