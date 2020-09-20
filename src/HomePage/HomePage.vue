@@ -28,16 +28,30 @@
       </b-collapse>
     </b-navbar>
     <div class="fixed-refresh-button">
-      <b-button pill size="sm" v-on:click="onFetchData" v-b-tooltip.hover title="Refresh news">
+      <b-button
+        pill
+        size="sm"
+        v-on:click="onFetchData"
+        v-b-tooltip.hover
+        title="Refresh news"
+      >
         <b-icon icon="arrow-clockwise" font-scale="2" animation="spin"></b-icon>
       </b-button>
     </div>
     <div class="fixed-loading-icon">
-      <b-icon v-if="loading" icon="three-dots" animation="cylon" font-scale="5"></b-icon>
+      <b-icon
+        v-if="loading"
+        icon="three-dots"
+        animation="cylon"
+        font-scale="5"
+      ></b-icon>
     </div>
     <div class="home-title-container">
       <h5 class="main-title">{{ weatherData.timezone }}</h5>
-      <b-row class="weather-wrapper" v-if="weatherData && weatherData.currently">
+      <b-row
+        class="weather-wrapper"
+        v-if="weatherData && weatherData.currently"
+      >
         <b-col cols="4" sm="4">
           <WeatherBox v-bind:weatherData="weatherData.currently" />
         </b-col>
@@ -45,16 +59,22 @@
           <WeatherBox
             v-bind:weatherData="{
               ...weatherData.hourly,
-              time: 'Hourly'
+              time: 'Hourly',
             }"
           />
         </b-col>
         <b-col cols="4" sm="4">
-          <WeatherBox v-bind:weatherData="{ ...weatherData.daily, time: 'Daily' }" />
+          <WeatherBox
+            v-bind:weatherData="{ ...weatherData.daily, time: 'Daily' }"
+          />
         </b-col>
       </b-row>
       <div v-bind:style="{ opacity: loading ? 0.7 : 1 }">
-        <div class="hot-new-container" v-for="item in hotNews" :key="item.index">
+        <div
+          class="hot-new-container"
+          v-for="item in hotNews"
+          :key="item.index"
+        >
           <img v-bind:src="`${item.image}`" />
           <div class="hot-new-content">
             <h4>{{ item.title }}</h4>
@@ -84,15 +104,18 @@
         </div>
       </div>
       <p v-bind:style="{ marginLeft: '20px' }">NEXT 7 DAYS</p>
-      <div class="weather-wrapper-inline">
+      <div class="weather-wrapper-inline" v-if="weatherData.daily">
         <span v-for="item in weatherData.daily.data" :key="item.index">
-          <WeatherBox v-bind:weatherData="item" />
+          <WeatherBox v-bind:weatherData="item" v-bind:type="TIME_TYPE.DAILY" />
         </span>
       </div>
       <p v-bind:style="{ marginLeft: '20px' }">NEXT 24 HOURS</p>
-      <div class="weather-wrapper-inline">
+      <div class="weather-wrapper-inline" v-if="weatherData.hourly">
         <span v-for="item in weatherData.hourly.data" :key="item.index">
-          <WeatherBox v-bind:weatherData="item" />
+          <WeatherBox
+            v-bind:weatherData="item"
+            v-bind:type="TIME_TYPE.HOURLY"
+          />
         </span>
       </div>
     </div>
@@ -101,10 +124,16 @@
 
 <script>
 import WeatherBox from "../components/WeatherBox/WeatherBox";
+import { TIME_TYPE } from "../const/index";
 export default {
   name: "HomePage",
   components: {
-    WeatherBox
+    WeatherBox,
+  },
+  data() {
+    return {
+      TIME_TYPE,
+    };
   },
   props: {
     msg: String,
@@ -113,8 +142,8 @@ export default {
     listNews: Array,
     onFetchData: Function,
     onSpeak: Function,
-    weatherData: Object
-  }
+    weatherData: Object,
+  },
 };
 </script>
 

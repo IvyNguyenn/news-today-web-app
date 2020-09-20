@@ -2,7 +2,7 @@
   <div
     :class="isDay ? 'weather-box-wrapper' : 'weather-box-wrapper weather-night'"
   >
-    <span>{{ convertDayTime(weatherData.time) }}</span>
+    <span>{{ convertDayTime(weatherData.time, type) }}</span>
     <img
       class="weather-img"
       v-if="weatherData.icon == 'rain'"
@@ -45,10 +45,13 @@
 </template>
 
 <script>
+import moment from "moment";
+import { DATE_TIME_FORMAT, TIME_TYPE } from "../../const/index";
 export default {
   name: "WeatherBox",
   props: {
     weatherData: Object,
+    type: String,
   },
   data() {
     return {
@@ -64,26 +67,24 @@ export default {
     },
     detectIsDayTime() {
       var hr = new Date().getHours();
-      console.log(hr);
       if (hr > 3 && hr < 16) {
         this.isDay = true;
       } else {
         this.isDay = false;
       }
     },
-    convertDayTime(time) {
+    convertDayTime(time, type) {
       if (typeof time === "string") {
         return time;
       }
-      let daytime = new Date(time);
-      return (
-        daytime.getDate() +
-        "/" +
-        daytime.getMonth() +
-        1 +
-        "/" +
-        daytime.getFullYear()
-      );
+      switch (type) {
+        case TIME_TYPE.DAILY:
+          return moment.unix(time).format(DATE_TIME_FORMAT.DAILY);
+        case TIME_TYPE.HOURLY:
+          return moment.unix(time).format("LT");
+        default:
+          return moment.unix(time).format(DATE_TIME_FORMAT.DATE_MONTH_YEAR);
+      }
     },
   },
 };
@@ -120,7 +121,7 @@ export default {
   margin: 10px;
 }
 .weather-box-wrapper .humidity-icon {
-  width: 15%;
+  width: 12px;
   object-fit: contain;
 }
 </style>

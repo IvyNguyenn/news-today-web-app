@@ -26,3 +26,20 @@ export const WEATHER_LOCATION = {
 export const WEATHER_IMG = {
   rain: "../../assets/icons/weather/rain.svg",
 };
+
+export const DATE_TIME_FORMAT = {
+  DATE_MONTH_YEAR: "DD/MM/YYYY",
+  DATE_TIME: "DD/MM/YYYY - hh:mm:ss",
+  DATE_SHORT_TIME: "DD/MM/YYYY - HH:mm",
+  DATE_TIME_24H: "YYYY-MM-DD HH:mm:ss",
+  YEAR_MONTH_DATE: "YYYY/MM/DD",
+  MONTH_NAME: "MMMM",
+  YEAR: "YYYY",
+  DATE: "DD",
+  DAILY: "dddd",
+};
+
+export const TIME_TYPE = {
+  DAILY: "DAILY",
+  HOURLY: "HOURLY",
+};
