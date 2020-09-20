@@ -13,7 +13,7 @@
           <b-nav-item href="#" v-on:click="onFetchData('hot')">Hot</b-nav-item>
           <b-nav-item href="#">About</b-nav-item>
           <b-nav-item href="#">Weather</b-nav-item>
-          <b-nav-item href="#" v-on:click="onSpeak">
+          <b-nav-item href="#">
             <b-icon icon="speaker"></b-icon>
           </b-nav-item>
         </b-navbar-nav>
@@ -104,6 +104,9 @@
         </div>
       </div>
       <p v-bind:style="{ marginLeft: '20px' }">NEXT 7 DAYS</p>
+      <small v-bind:style="{ marginLeft: '20px' }"
+        >Click on each item to hear the summary.</small
+      >
       <div class="weather-wrapper-inline" v-if="weatherData.daily">
         <span v-for="item in weatherData.daily.data" :key="item.index">
           <WeatherBox v-bind:weatherData="item" v-bind:type="TIME_TYPE.DAILY" />
@@ -141,7 +144,6 @@ export default {
     hotNews: Array,
     listNews: Array,
     onFetchData: Function,
-    onSpeak: Function,
     weatherData: Object,
   },
 };

@@ -1,8 +1,18 @@
 <template>
   <div
     :class="isDay ? 'weather-box-wrapper' : 'weather-box-wrapper weather-night'"
+    :style="isSpeaking ? { borderColor: '#dc3546' } : {}"
+    v-on:click="onTextToSpeech(datetime + weatherData.summary)"
   >
-    <span>{{ convertDayTime(weatherData.time, type) }}</span>
+    <span>{{ datetime }}</span>
+    <b-icon
+      v-if="isSpeaking"
+      class="speaking-icon"
+      icon="bullseye"
+      animation="throb"
+      font-scale="1.5"
+      variant="danger"
+    ></b-icon>
     <img
       class="weather-img"
       v-if="weatherData.icon == 'rain'"
@@ -30,15 +40,12 @@
       {{ convertToCelsius(weatherData.temperatureLow) }} -
       {{ convertToCelsius(weatherData.temperatureHigh) }} &deg;C
     </small>
-    <div
-      v-if="weatherData.humidity"
-      v-bind:style="{ display: 'flex', justifyContent: 'center' }"
-    >
-      <span>{{ weatherData.humidity }}</span>
-      <img
+    <div v-if="weatherData.humidity" class="humidity-wrapper">
+      <small>{{ weatherData.humidity }}</small>
+      <!-- <img
         class="humidity-icon"
         src="../../assets/icons/weather/humidity.svg"
-      />
+      /> -->
     </div>
     <span v-if="weatherData.summary">{{ weatherData.summary }}</span>
   </div>
@@ -56,10 +63,16 @@ export default {
   data() {
     return {
       isDay: true,
+      datetime: "",
+      synth: window.speechSynthesis,
+      voiceList: [],
+      greetingSpeech: new window.SpeechSynthesisUtterance(),
+      isSpeaking: false,
     };
   },
   mounted() {
     this.detectIsDayTime();
+    this.datetime = this.convertDayTime(this.weatherData.time, this.type);
   },
   methods: {
     convertToCelsius(cel) {
@@ -81,10 +94,29 @@ export default {
         case TIME_TYPE.DAILY:
           return moment.unix(time).format(DATE_TIME_FORMAT.DAILY);
         case TIME_TYPE.HOURLY:
-          return moment.unix(time).format("LT");
+          return moment.unix(time).calendar();
         default:
           return moment.unix(time).format(DATE_TIME_FORMAT.DATE_MONTH_YEAR);
       }
+    },
+    onTextToSpeech(text) {
+      if (this.synth.speaking) {
+        return;
+      }
+      // it should be 'craic', but it doesn't sound right
+      this.greetingSpeech.text = text;
+      this.greetingSpeech.rate = 1;
+      // this.greetingSpeech.voice = this.voiceList[this.selectedVoice]
+      // Start speak ===========================
+      this.greetingSpeech.onstart = function() {
+        this.isSpeaking = true;
+      }.bind(this);
+      // Speak ===========================
+      this.synth.speak(this.greetingSpeech);
+      // End speak ===========================
+      this.greetingSpeech.onend = function() {
+        this.isSpeaking = false;
+      }.bind(this);
     },
   },
 };
@@ -93,6 +125,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .weather-box-wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -115,13 +148,27 @@ export default {
   ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 .weather-box-wrapper .weather-img {
-  width: 70%;
+  width: 80%;
   height: 100px;
   object-fit: contain;
-  margin: 10px;
+}
+.weather-box-wrapper .humidity-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 .weather-box-wrapper .humidity-icon {
   width: 12px;
   object-fit: contain;
+}
+.weather-box-wrapper .speaking-icon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+@media screen and (max-width: 600px) {
+  .weather-box-wrapper h4 {
+    font-size: 1rem !important;
+  }
 }
 </style>
